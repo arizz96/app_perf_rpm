@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Tracing
     class ManagedSpan < Span
@@ -27,9 +29,11 @@ module AppPerfRpm
         end
       end
 
-      def finish(end_time: AppPerfRpm.now)
+      def finish(opts = {})
+        opts[:end_time] ||= AppPerfRpm.now
+
         deactivate
-        @span.finish(end_time: end_time)
+        @span.finish(end_time: opts[:end_time])
       end
     end
   end

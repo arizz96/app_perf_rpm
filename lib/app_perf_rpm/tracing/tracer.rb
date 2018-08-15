@@ -1,13 +1,18 @@
-require 'opentracing'
+# frozen_string_literal: true
 
 module AppPerfRpm
   module Tracing
     class Tracer
       attr_reader :thread_span_stack, :collector
 
-      def self.build(collector:, sender:, service_name:)
-        sender.start
-        new(collector, sender)
+      def self.build(opts = {})
+        opts[:collector] ||= nil
+        opts[:sender] ||= nil
+        opts[:service_name] ||= nil
+
+        opts[:sender].start
+
+        new(opts[:collector], opts[:sender])
       end
 
       def initialize(collector, sender)
@@ -19,7 +24,11 @@ module AppPerfRpm
         @sender.stop
       end
 
-      def start_span(operation_name, child_of: nil, start_time: AppPerfRpm.now, tags: {}, **)
+      def start_span(operation_name, opts = {}, *)
+        child_of = opts[:child_of] || nil
+        opts[:start_time] ||= AppPerfRpm.now
+        opts[:tags] ||= {}
+
         context =
           if child_of
             parent_context = child_of.respond_to?(:context) ? child_of.context : child_of
@@ -29,8 +38,8 @@ module AppPerfRpm
           end
 
         span = Span.new(context, operation_name, @collector, {
-          start_time: start_time,
-          tags: tags
+          start_time: opts[:start_time],
+          tags: opts[:tags]
         })
       end
 

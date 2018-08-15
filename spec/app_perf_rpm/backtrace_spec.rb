@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe AppPerfRpm::Backtrace do
   it "should not return backtrace" do
-    backtrace = AppPerfRpm::Backtrace.backtrace(kind: nil)
+    backtrace = AppPerfRpm::Backtrace.backtrace({ :kind => nil })
     expect(backtrace).to eql(nil)
   end
 
@@ -16,14 +16,14 @@ describe AppPerfRpm::Backtrace do
       {
         "file"=>"[APP_PATH]/lib/app_perf_rpm/backtrace.rb",
         "code"=>{
-          43=>"      #end\n",
-          44=>"\n",
-          45=>"      def source_extract(backtrace: Kernel.caller(0))\n",
-          46=>"        Array(backtrace).select {|bt| bt[/^\#{::AppPerfRpm.config.app_root.to_s}\\//] }.map do |trace|\n",
-          47=>"          file, line_number = extract_file_and_line_number(trace)\n",
-          48=>"          source_to_hash(file, line_number)\n"
+          48=>"\n",
+          49=>"      def source_extract(opts = {})\n",
+          50=>"        backtrace = opts[:backtrace] || Kernel.caller(0)\n",
+          51=>"\n",
+          52=>"        Array(backtrace).select {|bt| bt[/^\#{::AppPerfRpm.config.app_root.to_s}\\//] }.map do |trace|\n",
+          53=>"          file, line_number = extract_file_and_line_number(trace)\n"
         },
-        "line_number"=>45
+        "line_number"=>50
       },
       {
         "file"=>"[APP_PATH]/spec/app_perf_rpm/backtrace_spec.rb",

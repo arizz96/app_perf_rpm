@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Tracing
     class Span
       attr_accessor :operation_name
 
       attr_reader :context, :start_time, :end_time, :tags, :log_entries
-      def initialize(context, operation_name, collector, start_time: AppPerfRpm.now, tags: {})
+      def initialize(context, operation_name, collector, opts = {})
         @context = context
         @operation_name = operation_name
         @collector = collector
-        @start_time = start_time
+        @start_time = opts[:start_time] || AppPerfRpm.now
         @end_time = nil
-        @tags = tags
+        @tags = opts[:tags] || {}
         @log_entries = []
       end
 
@@ -32,22 +34,25 @@ module AppPerfRpm
         @context.get_baggage_item(key)
       end
 
-      def log(event: nil, timestamp: AppPerfRpm.now, **fields)
+      # Original definition for ruby 2+ was this:
+      # def log(opts = { :event => nil, :timestamp => AppPerfRpm.now }, **fields)
+      # but this doesn't work in 1.9.
+      def log(opts = {}, *_, fields)
         entry = {
-          "event" => event,
-          "timestamp" => timestamp,
+          "event" => opts[:event] || nil,
+          "timestamp" => opts[:timestamp] || AppPerfRpm.now,
         }
 
-        entry["fields"] = fields if fields
+        entry["fields"] = fields
         @log_entries << entry
 
         nil
       end
 
-      def log_error(exception, timestamp: AppPerfRpm.now)
+      def log_error(exception, opts = {})
         log(
           event: "error",
-          timestamp: timestamp,
+          timestamp: opts[:timestamp] || AppPerfRpm.now,
           message: exception.message,
           error_class: exception.class.to_s,
           backtrace: AppPerfRpm::Backtrace.clean(exception.backtrace),
@@ -55,12 +60,12 @@ module AppPerfRpm
         )
       end
 
-      def exit(end_time: AppPerfRpm.now)
-        @end_time = end_time
+      def exit(opts = {})
+        @end_time = opts[:end_time] || AppPerfRpm.now
       end
 
-      def finish(end_time: AppPerfRpm.now)
-        @collector.send_span(self, @end_time || end_time)
+      def finish(opts = {})
+        @collector.send_span(self, @end_time || opts[:end_time] || AppPerfRpm.now)
       end
     end
   end

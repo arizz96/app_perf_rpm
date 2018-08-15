@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   class Backtrace
     class << self
-      def backtrace(kind: :all)
+      def backtrace(opts = {})
+        kind = opts[:kind]
+
         if kind
           bt = Kernel.caller
           bt = clean(bt)
@@ -42,7 +46,9 @@ module AppPerfRpm
       #  end
       #end
 
-      def source_extract(backtrace: Kernel.caller(0))
+      def source_extract(opts = {})
+        backtrace = opts[:backtrace] || Kernel.caller(0)
+
         Array(backtrace).select {|bt| bt[/^#{::AppPerfRpm.config.app_root.to_s}\//] }.map do |trace|
           file, line_number = extract_file_and_line_number(trace)
           source_to_hash(file, line_number)
@@ -91,7 +97,9 @@ module AppPerfRpm
         [file, line.to_i]
       end
 
-      def trim_backtrace(_backtrace, kind: :all)
+      def trim_backtrace(_backtrace, opts = {})
+        kind = opts[:kind]
+
         return _backtrace unless _backtrace.is_a?(Array)
 
         length = _backtrace.size

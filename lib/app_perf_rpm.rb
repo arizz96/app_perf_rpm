@@ -1,6 +1,9 @@
-require 'msgpack'
+# frozen_string_literal: true
 
 module AppPerfRpm
+  require "opentracing"
+  require 'msgpack'
+  
   require 'app_perf_rpm/logger'
   require 'app_perf_rpm/configuration'
   require 'app_perf_rpm/backtrace'
@@ -150,7 +153,11 @@ module AppPerfRpm
     end
 
     def now
-      Process.clock_gettime(Process::CLOCK_REALTIME)
+      if defined?(Process::CLOCK_REALTIME)
+        Process.clock_gettime(Process::CLOCK_REALTIME)
+      else
+        Time.now
+      end
     end
 
   end

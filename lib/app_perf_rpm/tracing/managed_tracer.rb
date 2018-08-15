@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Tracing
-    class ManagedTracer < OpenTracing::Tracer
+    class ManagedTracer
       extend Forwardable
       def_delegators :@tracer, :inject, :extract
 
@@ -23,8 +25,10 @@ module AppPerfRpm
         thread_span_stack.active_span
       end
 
-      def start_span(operation_name, child_of: active_span, **args)
-        span = @tracer.start_span(operation_name, child_of: child_of, **args)
+      def start_span(operation_name, opts = {}, *args)
+        opts[:child_of] ||= active_span
+
+        span = @tracer.start_span(operation_name, opts, *args)
         @thread_span_stack.set_active_span(span)
       end
     end

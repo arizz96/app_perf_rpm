@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Tracing
     class SpanContext
@@ -17,12 +19,12 @@ module AppPerfRpm
 
       attr_reader :span_id, :parent_id, :trace_id, :baggage
 
-      def initialize(span_id:, parent_id: nil, trace_id:, sampled:, baggage: {})
-        @span_id = span_id
-        @parent_id = parent_id
-        @trace_id = trace_id
-        @sampled = sampled
-        @baggage = baggage
+      def initialize(opts = {})
+        @span_id = opts[:span_id] || nil
+        @parent_id = opts[:parent_id] || nil
+        @trace_id = opts[:trace_id] || nil
+        @sampled = opts[:sampled] || nil
+        @baggage = opts[:baggage] || {}
       end
 
       def set_baggage_item(key, value)

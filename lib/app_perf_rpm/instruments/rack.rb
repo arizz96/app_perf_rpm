@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Instruments
     module RackModule
@@ -90,6 +92,7 @@ if ::AppPerfRpm.config.instrumentation[:rack][:enabled]
           raise
         ensure
           span.finish if span
+          AppPerfRpm::Tracer.sample_off!
         end
 
         def ignore_path?(path)

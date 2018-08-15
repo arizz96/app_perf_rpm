@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   class Introspector
 
     VALID_RUNNERS = [
-      :Passenger,
+      :PhusionPassenger,
       :Puma,
       :Rainbows,
       :Resque,

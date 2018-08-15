@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   class SidekiqServer
     def call(*args)
@@ -28,6 +30,7 @@ module AppPerfRpm
       raise
     ensure
       span.finish if span
+      AppPerfRpm::Tracer.sample_off!
     end
 
     private

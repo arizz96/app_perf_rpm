@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Utils
     REGEXP ||= Regexp.new('(\'[\s\S][^\']*\'|\d*\.\d+|\d+|NULL)')
@@ -7,7 +9,7 @@ module AppPerfRpm
     end
 
     def connection_config
-      @connection_config ||= if ::ActiveRecord::VERSION::MAJOR == 2
+      @connection_config ||= if ::ActiveRecord::VERSION::MAJOR == 2 || (::ActiveRecord::VERSION::MAJOR == 3 && ::ActiveRecord::VERSION::MINOR < 1)
                                ActiveRecord::Base.connection.instance_variable_get(:@config)
                              else
                                ::ActiveRecord::Base.connection_config

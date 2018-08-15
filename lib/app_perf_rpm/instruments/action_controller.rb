@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AppPerfRpm
   module Instruments
     module ActionController
@@ -13,6 +15,8 @@ module AppPerfRpm
 
         process_action_without_trace(method_name, *args)
       rescue Exception => e
+        puts e.message.inspect
+        puts e.backtrace.join("\n")
         if span
           span.set_tag('error', true)
           span.log_error(e)
